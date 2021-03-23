@@ -150,6 +150,7 @@ public class Images {
         
         // scales the input image to the output image
         Graphics2D g2d = outputImage.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.drawImage(img, 0, 0, scaledWidth, scaledHeight, null);
         g2d.dispose();
         
