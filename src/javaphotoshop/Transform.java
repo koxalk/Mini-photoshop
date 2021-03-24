@@ -1,10 +1,7 @@
 package javaphotoshop;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.RescaleOp;
-
+import java.awt.*;
+import java.awt.image.*;
 public class Transform {
 
     public Transform() {
@@ -188,7 +185,6 @@ public class Transform {
 
         return newImage;
     }
-    
     
     public BufferedImage color_red(BufferedImage img){
         // get width and height

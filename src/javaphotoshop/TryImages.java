@@ -18,7 +18,7 @@ public class TryImages {
         String type = "png";
         
         //svae the image using the type of image
-        String output = "C://Users/kosta/Documents/NetBeansProjects/JavaPhotoShop/src/output/coloredBlue." + type;
+        String output = "C://Users/kosta/Documents/NetBeansProjects/JavaPhotoShop/src/output/zrotate180." + type;
         
         //set pixel of image
         imgt.setX_pixels(800);
@@ -62,8 +62,13 @@ public class TryImages {
         
        // img= trf.color_red(img);
         
-       img = trf.color_blue(img);
+      // img = trf.color_blue(img);
        
+      //img = imgt.crop_image(img, 80,100, 120, 140);
+      
+      //img = imgt.zoom_in(img, 2);
+      
+        img= imgt.rotateImageByDegrees(img, 180);
         //save the new image
         imgt.writeImage(img, type, output);
     }

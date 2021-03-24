@@ -1,21 +1,14 @@
 package javaphotoshop;
 
-import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Robot;
-import java.awt.Toolkit;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.ImageObserver;
+import java.io.*;
 import javax.imageio.ImageIO;
 
 public class Images {
-    
+
     public int x_pixels;
     public int y_pixels;
     public String filename;
@@ -23,7 +16,7 @@ public class Images {
     public String output;
 
     Images() {
-        
+
     }
 
     public int getX_pixels() {
@@ -73,33 +66,32 @@ public class Images {
         this.input = input;
         this.output = output;
     }
-    
-    
-    public BufferedImage readImage(String filename){
-        try{
-          BufferedImage image = null;
-          File f = null;
-          
-          f=new File(filename);
-          
-          image = new BufferedImage(this.x_pixels, this.y_pixels, BufferedImage.TYPE_INT_ARGB);
-         
-          image = ImageIO.read(f);
-          
-          return image;
-        }catch(IOException e){
+
+    public BufferedImage readImage(String filename) {
+        try {
+            BufferedImage image = null;
+            File f = null;
+
+            f = new File(filename);
+
+            image = new BufferedImage(this.x_pixels, this.y_pixels, BufferedImage.TYPE_INT_ARGB);
+
+            image = ImageIO.read(f);
+
+            return image;
+        } catch (IOException e) {
             System.out.println(e);
         }
-        
+
         return null;
     }
-    
-    public String writeImage(BufferedImage image,String type,String outputLocation) {
+
+    public String writeImage(BufferedImage image, String type, String outputLocation) {
         try {
-            File f= new File(outputLocation);
-            
+            File f = new File(outputLocation);
+
             ImageIO.write(image, type, f);
-            
+
             return "Write Sucess";
         } catch (IOException e) {
             System.out.println("Exception: " + e);
@@ -107,34 +99,34 @@ public class Images {
 
         return null;
     }
-    
-    public BufferedImage watermrk_the_image(BufferedImage img, String watermark){
+
+    public BufferedImage watermrk_the_image(BufferedImage img, String watermark) {
         // create BufferedImage object of same width and 
         // height as of input image 
-        BufferedImage temp = new BufferedImage(img.getWidth(), 
-                    img.getHeight(), BufferedImage.TYPE_INT_RGB); 
-  
+        BufferedImage temp = new BufferedImage(img.getWidth(),
+                img.getHeight(), BufferedImage.TYPE_INT_RGB);
+
         // Create graphics object and add original 
         // image to it 
-        Graphics graphics = temp.getGraphics(); 
-        graphics.drawImage(img, 0, 0, null); 
-  
+        Graphics graphics = temp.getGraphics();
+        graphics.drawImage(img, 0, 0, null);
+
         // Set font for the watermark text 
-        graphics.setFont(new Font("Arial", Font.PLAIN, 80)); 
-        graphics.setColor(new Color(0, 0, 0, 40)); 
-        
+        graphics.setFont(new Font("Arial", Font.PLAIN, 80));
+        graphics.setColor(new Color(0, 0, 0, 40));
+
         // Add the watermark text at (width/5, height/3) 
         // location 
-        graphics.drawString(watermark, img.getWidth()/5, 
-                                   img.getHeight()/3); 
-  
+        graphics.drawString(watermark, img.getWidth() / 5,
+                img.getHeight() / 3);
+
         // releases any system resources that it is using 
         graphics.dispose();
-        
+
         return temp;
     }
-    
-    public BufferedImage resize(BufferedImage img,int targetWidth, int targetHeight) {
+
+    public BufferedImage resize(BufferedImage img, int targetWidth, int targetHeight) {
         BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D graphics2D = resizedImage.createGraphics();
@@ -144,37 +136,80 @@ public class Images {
 
         return resizedImage;
     }
-    
-    public BufferedImage resize_by_percent(BufferedImage img,double percent){
+
+    public BufferedImage resize_by_percent(BufferedImage img, double percent) {
         int scaledWidth = (int) (img.getWidth() * percent);
         int scaledHeight = (int) (img.getHeight() * percent);
-        
+
         BufferedImage outputImage = new BufferedImage(scaledWidth,
                 scaledHeight, img.getType());
-        
+
         // scales the input image to the output image
         Graphics2D g2d = outputImage.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.drawImage(img, 0, 0, scaledWidth, scaledHeight, null);
         g2d.dispose();
-        
+
         return outputImage;
     }
-    
-    public BufferedImage screenshot(){
-       try {
+
+    public BufferedImage screenshot() {
+        try {
             Robot robot = new Robot();
 
             Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
             BufferedImage screenFullImage = robot.createScreenCapture(screenRect);
-             
+
             System.out.println("A full screenshot saved!");
-            
+
             return screenFullImage;
         } catch (AWTException ex) {
             System.err.println(ex);
         }
-       
-       return null;
+
+        return null;
+    }
+
+    public BufferedImage crop_image(BufferedImage img, int x, int y, int width, int height) {
+        BufferedImage croppedImage = img.getSubimage(x, y, width, height);
+        return croppedImage;
+    }
+    
+    public BufferedImage zoom_in(BufferedImage img, int per) {
+        int newImageWidth = img.getWidth(null) * per;
+        int newImageHeight = img.getHeight(null) * per;
+        
+        BufferedImage resizedImage = new BufferedImage(newImageWidth, newImageHeight, BufferedImage.TYPE_INT_ARGB);
+        
+        Graphics2D grph = (Graphics2D) resizedImage.getGraphics();
+        grph.scale(per, per);
+        grph.drawImage(img, 0, 0, null);
+        grph.dispose();
+
+        return resizedImage;
+    }
+    
+    public BufferedImage rotateImageByDegrees(BufferedImage img, double angle) {
+        double rads = Math.toRadians(angle);
+        double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
+        int w = img.getWidth();
+        int h = img.getHeight();
+        int newWidth = (int) Math.floor(w * cos + h * sin);
+        int newHeight = (int) Math.floor(h * cos + w * sin);
+
+        BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = rotated.createGraphics();
+        AffineTransform at = new AffineTransform();
+        at.translate((newWidth - w) / 2, (newHeight - h) / 2);
+
+        int x = w / 2;
+        int y = h / 2;
+
+        at.rotate(rads, x, y);
+        g2d.setTransform(at);
+        g2d.drawImage(img, 0, 0, null);
+        g2d.dispose();
+
+        return rotated;
     }
 }
